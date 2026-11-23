@@ -1,0 +1,32 @@
+# Kaggle-Correlated Score (KCS) weights.
+#
+# Last updated: 2026-04-27 — raised 4p-ffa from 0.10 → 0.25 after retest.
+# Prior version archived at configs/archive/kcs_weights_pre-2026-04-27_4p10pct.yaml.
+#
+# RETEST EVIDENCE (2026-04-27, 20 seeds each):
+#   The "0/7 in 4P for EXP-036" signal from docs/learn-replays/episode-analysis.md
+#   refers to KAGGLE REAL-OPPONENT 4P games, not local 4P-vs-random. Local retest:
+#     - agent_v82_flat_exp036.py vs 3 random in 4P → 19/20 = 95% WIN
+#     - main.py                  vs 3 random in 4P → 18/20 = 90% WIN
+#     - main.py vs 1 EXP-036 + 2 random in 4P      → 20/20 = 100% WIN
+#   Conclusion: the 4P-vs-random axis cannot DETECT the real 4P weakness, but
+#   the weakness IS real on the live ladder. Raising the weight to 0.25 is the
+#   first half of the fix; the second half is replacing the random opponent in
+#   this axis with a stronger pool (tracked as EXP-330/331 in tasks/plan.md).
+#
+# Calibration history: only four axes had submission rows we trust at Phase 3.5:
+# self-play vs EXP-036, random, 4P FFA, and the older Kaggle-peak proxy
+# (`agent_v27_kaggle_peak.py`). Auxiliary axes remain useful for offline
+# profiling but are removed from the submit gate until backed by live
+# submission evidence.
+axes:
+  self_play: 0.40         # EXP-330: 0.55 → 0.40 (room for 5 pool axes)
+  random: 0.08
+  4p-ffa: 0.30            # EXP-331: ≥0.30 per plan.md; was 0.25 (replay LEARN-#1)
+  v27_kaggle_peak: 0.06
+  # EXP-330: diverse opponent pool (5 distinct styles from opponents/)
+  pool_rusher: 0.04
+  pool_comet_hunter: 0.04
+  pool_champion_v881: 0.04
+  pool_champion_v920: 0.02
+  pool_champion_v750: 0.02

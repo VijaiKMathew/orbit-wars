@@ -1,0 +1,18 @@
+[project]
+name = "orbit-wars-solution"
+version = "1.0.0"
+description = "Elite Champion Agent for Kaggle Orbit Wars Real-Time Strategy Challenge"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "numba>=0.58.0",
+    "jax>=0.4.20",
+    "jaxlib>=0.4.20",
+    "pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

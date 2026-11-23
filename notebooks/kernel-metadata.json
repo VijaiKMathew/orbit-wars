@@ -1,0 +1,14 @@
+{
+  "id": "vijaikm/orbit-wars-agent-solution-walkthrough",
+  "title": "Orbit Wars Agent Solution Walkthrough",
+  "code_file": "01_solution_walkthrough.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": false,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": ["orbit-wars"],
+  "kernel_sources": []
+}

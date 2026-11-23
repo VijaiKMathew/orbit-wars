@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orbit Wars — Analytical Intercept Geometry & Vectorized Rollouts (Rank 2,175 / 4,319 • Score 844.5)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #080c16;
+      --bg-secondary: #0e1526;
+      --bg-card: rgba(17, 26, 46, 0.75);
+      --bg-card-hover: rgba(26, 38, 66, 0.95);
+      --bg-code: #050811;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.4);
+      --accent-indigo: #6366f1;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #f1f5f9;
+      --bg-card: rgba(255, 255, 255, 0.95);
+      --bg-card-hover: #ffffff;
+      --bg-code: #0f172a;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-highlight: rgba(79, 70, 229, 0.35);
+      --accent-indigo: #4f46e5;
+      --accent-cyan: #0284c7;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --accent-rose: #e11d48;
+      --accent-purple: #9333ea;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.06) 0%, transparent 60%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Sticky Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(8, 12, 22, 0.85);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 0;
+      transition: background 0.3s ease;
+    }
+    [data-theme="light"] header {
+      background: rgba(248, 250, 252, 0.85);
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .brand-tag {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent-indigo);
+      font-weight: 600;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--accent-cyan);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-indigo);
+      transform: translateY(-1px);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.45);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 56px 0 40px;
+      text-align: center;
+    }
+    .hero-badge-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .badge-pill.highlight {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.4);
+      color: var(--accent-indigo);
+    }
+
+    .hero h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.18;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    [data-theme="light"] .hero h1 {
+      background: linear-gradient(135deg, #0f172a 30%, #475569 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 820px;
+      margin: 0 auto 28px;
+    }
+
+    .author-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+    }
+    .author-card strong {
+      color: var(--text-primary);
+    }
+
+    /* KPI Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 22px 20px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s;
+    }
+    .metric-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-highlight);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+    }
+    .metric-val {
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .metric-label {
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .metric-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .purple { color: var(--accent-purple); }
+    .cyan { color: var(--accent-cyan); }
+    .emerald { color: var(--accent-emerald); }
+    .amber { color: var(--accent-amber); }
+
+    /* Section Styling */
+    section {
+      padding: 44px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .section-header {
+      margin-bottom: 28px;
+    }
+    .section-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-cyan);
+      margin-bottom: 6px;
+    }
+    .section-title {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+    .section-desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      max-width: 800px;
+    }
+
+    /* Simulation Canvas Container */
+    .sim-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .sim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.2);
+    }
+    .sim-canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      background: #040711;
+    }
+    canvas#orbitCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Figures Grid */
+    .figures-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(540px, 1fr));
+      gap: 24px;
+    }
+    @media (max-width: 640px) {
+      .figures-grid { grid-template-columns: 1fr; }
+    }
+    .figure-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: all 0.25s;
+    }
+    .figure-card:hover {
+      border-color: var(--border-highlight);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+    }
+    .figure-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-bottom: 1px solid var(--border-color);
+      background: #ffffff;
+    }
+    .figure-caption {
+      padding: 16px 18px;
+    }
+    .figure-caption h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+    .figure-caption p {
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 24px;
+      transition: all 0.25s;
+    }
+    .feature-card:hover {
+      border-color: var(--border-highlight);
+      transform: translateY(-2px);
+    }
+    .feature-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-card);
+      margin-top: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+    th {
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg-card-hover); }
+
+    /* Code Blocks */
+    pre {
+      background: var(--bg-code);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.825rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    /* Interview Kit Lens */
+    .lens-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .lens-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lens-btn.active, .lens-btn:hover {
+      background: var(--accent-indigo);
+      color: #ffffff;
+      border-color: var(--accent-indigo);
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 24px;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    .bullet-list li::before {
+      content: "▹";
+      position: absolute;
+      left: 6px;
+      top: 0;
+      color: var(--accent-cyan);
+      font-weight: bold;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #10b981;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: all 0.3s ease;
+      z-index: 9999;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    footer {
+      padding: 40px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.825rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header>
+    <div class="container nav-inner">
+      <a href="#overview" class="brand">
+        🪐 Orbit Wars
+        <span class="brand-tag">Rank 2,175 / 4,319 • Score 844.5</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#simulation">Simulator</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#figures">Figures</a></li>
+        <li><a href="#benchmarks">Benchmarks</a></li>
+        <li><a href="#failures">Autopsies</a></li>
+        <li><a href="#interview">Interview Kit</a></li>
+        <li><a href="#reproduce">Quickstart</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="btn" onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Dark/Light Mode">🌙</button>
+        <a href="https://github.com/VijaiKMathew/orbit-wars" target="_blank" class="btn">
+          <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+          GitHub
+        </a>
+        <a href="https://www.kaggle.com/competitions/orbit-wars/writeups/orbit-wars-analytical-solver-844#3554562" target="_blank" class="btn btn-primary">
+          Writeup
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Hero Section -->
+    <section class="hero" id="overview">
+      <div class="hero-badge-strip">
+        <span class="badge-pill highlight">🏆 Top 50% Worldwide</span>
+        <span class="badge-pill">DOI: 10.34740/kaggle/w/126318</span>
+        <span class="badge-pill">Kaggle LB: 844.5</span>
+        <span class="badge-pill">Peak Score: 899.1</span>
+        <span class="badge-pill">Turn Budget: 18ms / 500ms</span>
+        <span class="badge-pill">MIT License</span>
+      </div>
+
+      <h1>Analytical Intercept Geometry &amp; Vectorized Rollouts</h1>
+      <p class="hero-subtitle">
+        An autonomous real-time decision engine and Keplerian orbital physics simulator cutting discrete simulation step latency by 94% ((1)$ collision root-finding) with 16-step lookahead rollouts across 500 competition turns.
+      </p>
+
+      <div class="author-card">
+        <span>Engineered by</span>
+        <strong>Vijai K. Mathew</strong>
+        <span>•</span>
+        <span>Senior Machine Learning Engineer &amp; Autonomous Systems Architect</span>
+        <span>•</span>
+        <a href="https://www.kaggle.com/vijaikm" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">@vijaikm</a>
+      </div>
+
+      <!-- KPI Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-val purple">1,445+</div>
+          <div class="metric-label">Benchmark Experiments</div>
+          <div class="metric-sub">Ablated across 26 distinct baseline bots</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val cyan">1.5M+</div>
+          <div class="metric-label">Sim Steps / Second</div>
+          <div class="metric-sub">Vectorized physics kernel via JAX / Numba</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val emerald">899.1</div>
+          <div class="metric-label">Peak ELO Recorded</div>
+          <div class="metric-sub">+738.1 Elo gain over greedy baseline (161.0)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val amber">18 ms</div>
+          <div class="metric-label">Average Turn Latency</div>
+          <div class="metric-sub">94% reduction below 500ms platform timeout</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Simulator -->
+    <section id="simulation">
+      <div class="section-header">
+        <div class="section-tag">Live Interactive Engine</div>
+        <h2 class="section-title">Continuous 2D Keplerian Orbital Simulator</h2>
+        <p class="section-desc">
+          Experience the live continuous space physics engine. Planets follow Keplerian angular velocity laws around the gravitational sun, computing real-time intercept fleet trajectories.
+        </p>
+      </div>
+
+      <div class="sim-card">
+        <div class="sim-header">
+          <div>
+            <strong style="color: var(--text-primary); font-size: 0.95rem;">Live Canvas Engine</strong>
+            <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">6 Concentric Planetary Shells</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-primary" id="simToggleBtn" onclick="toggleSim()">Pause Simulation</button>
+            <button class="btn" onclick="dispatchFleets()">🚀 Dispatch Intercept</button>
+            <button class="btn" onclick="resetSim()">Reset</button>
+          </div>
+        </div>
+        <div class="sim-canvas-wrap">
+          <canvas id="orbitCanvas"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- High-Resolution Figures -->
+    <section id="figures">
+      <div class="section-header">
+        <div class="section-tag">Visual Documentation &amp; Artifacts</div>
+        <h2 class="section-title">System Architecture &amp; Empirical Benchmark Figures</h2>
+        <p class="section-desc">
+          Official high-resolution figures from the published Kaggle solution writeup, illustrating systems architecture, competitive matrix, depth latency curves, and ablation waterfalls.
+        </p>
+      </div>
+
+      <div class="figures-grid">
+        <!-- Figure 0 -->
+        <div class="figure-card" style="grid-column: 1 / -1;">
+          <img src="https://www.googleapis.com/download/storage/v1/b/kaggle-user-content/o/inbox%2F648464%2Fcd598e5731ab1131ca978df016b63219%2Ffigure0_system_hld.png?generation=1794547440438055&amp;alt=media" alt="Figure 0: System High-Level Design Architecture">
+          <div class="figure-caption">
+            <h4>Figure 0: High-Level Systems Architecture</h4>
+            <p>End-to-end decision loop: Environment state ingestion $	o$ (1)$ Analytical Orbital Root Solver $	o$ Candidate Action Generator $	o$ 16-Step Vectorized Forward Rollout $	o$ Transit Return Defense $	o$ 18ms Dispatch.</p>
+          </div>
+        </div>
+
+        <!-- Figure 1 -->
+        <div class="figure-card">
+          <img src="https://www.googleapis.com/download/storage/v1/b/kaggle-user-content/o/inbox%2F648464%2F17c736022bad6898615dacecc4c9053d%2Ffigure1_head_to_head_matrix.png?generation=1794547480886277&amp;alt=media" alt="Figure 1: Head-to-Head Win-Rate Matrix">
+          <div class="figure-caption">
+            <h4>Figure 1: Head-to-Head Win-Rate Matrix</h4>
+            <p>20-seed pairwise tournament across 26 archetype bots. The analytical lookahead agent achieved an 80.0% win rate against production heuristics.</p>
+          </div>
+        </div>
+
+        <!-- Figure 2 -->
+        <div class="figure-card">
+          <img src="https://www.googleapis.com/download/storage/v1/b/kaggle-user-content/o/inbox%2F648464%2Ffae96dd4c5f97c3375a9b625025c9709%2Ffigure2_score_progression.png?generation=1794547495970217&amp;alt=media" alt="Figure 2: Score Progression Across Experiments">
+          <div class="figure-caption">
+            <h4>Figure 2: Empirical Score Progression</h4>
+            <p>Evolutionary trajectory from raw baseline (496.3) to Python forward simulation (753.3), dynamic overage banking (821.9), and verified champion (844.5).</p>
+          </div>
+        </div>
+
+        <!-- Figure 3 -->
+        <div class="figure-card">
+          <img src="https://www.googleapis.com/download/storage/v1/b/kaggle-user-content/o/inbox%2F648464%2F4095abb07cfb61b573a92d3e266ef304%2Ffigure3_search_depth_latency.png?generation=1794547525429757&amp;alt=media" alt="Figure 3: Search Depth &amp; Latency Sensitivity">
+          <div class="figure-caption">
+            <h4>Figure 3: Search Depth &amp; Latency Sensitivity</h4>
+            <p>Turn latency scaling vs lookahead depth. Depth 16 achieves the optimal Pareto sweet spot between strategic lookahead and the 18ms latency budget.</p>
+          </div>
+        </div>
+
+        <!-- Figure 4 -->
+        <div class="figure-card">
+          <img src="https://www.googleapis.com/download/storage/v1/b/kaggle-user-content/o/inbox%2F648464%2F540bc4ecb2df0405b15a9925ed7de3af%2Ffigure4_feature_ablation.png?generation=1794547537323944&amp;alt=media" alt="Figure 4: What Worked vs What Hurt">
+          <div class="figure-caption">
+            <h4>Figure 4: Component Ablation Waterfall</h4>
+            <p>Quantifying the impact of analytical roots (+257 Elo), transit defense (+88 Elo), and 60s dynamic overage banking (+65 Elo) vs negative ablations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Systems Architecture -->
+    <section id="architecture">
+      <div class="section-header">
+        <div class="section-tag">Core Engineering</div>
+        <h2 class="section-title">Key Algorithmic Breakthroughs</h2>
+        <p class="section-desc">
+          How analytical geometry and vectorized simulation overcome real-time execution constraints in complex continuous multi-agent environments.
+        </p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="feature-card">
+          <h3>📐 Analytical Orbital Root Solver</h3>
+          <p>
+            Replaced 320ms discrete multi-step physics simulations with exact (1)$ trigonometric root-finding. Given target planetary angular velocity $\omega_t$ and orbital radius $, the arrival equation $\|ec{r}_t(t) - ec{x}_0\| = v_{	ext{ship}} \cdot t$ is solved in under \,\mu	ext{s}$.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <h3>⚡ 16-Step Vectorized Lookahead</h3>
+          <p>
+            Evaluates candidate fleet dispatches across an explicit 16-turn forward timeline. Models garrison production replenishment, incoming third-party hostile fleets, and opportunistic 4-player snipe opportunities.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🛡️ Transit Return Defense</h3>
+          <p>
+            Prevents catastrophic back-door captures by tracking friendly and hostile fleets in flight. Reserves local garrison troops when a planetary garrison is threatened within $\Delta t \le 8$ turns.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <h3>⏱️ Dynamic 60s Overage Time Banking</h3>
+          <p>
+            Rather than allocating a uniform 100ms per turn, the engine runs at 8-12ms during trivial consolidation turns and banks time to spend up to 450ms during critical multi-front fleet collisions.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cross-Competitor Benchmarks -->
+    <section id="benchmarks">
+      <div class="section-header">
+        <div class="section-tag">Competitive Landscape</div>
+        <h2 class="section-title">Cross-Competitor Analysis &amp; Top 10 Lessons</h2>
+        <p class="section-desc">
+          Positioning our analytical vectorized engine against elite compute-heavy RL and top heuristic Grandmasters.
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tier / Approach</th>
+              <th>Score Range</th>
+              <th>Key Exemplars</th>
+              <th>Core Mechanism</th>
+              <th>Compute &amp; Tradeoffs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color: var(--accent-purple);">Tier 1: Elite RL</strong></td>
+              <td>2,000 – 2,062</td>
+              <td>Isaiah @ Tufa Labs (#1), Jake Will (#2)</td>
+              <td>Massive self-play JAX PPO, test-time rollouts, prioritized fictitious play (PFSP)</td>
+              <td>Clusters of 8x H100s; high offline training investment, supreme emergent tactics.</td>
+            </tr>
+            <tr>
+              <td><strong style="color: var(--accent-cyan);">Tier 2: Heuristic SOTA</strong></td>
+              <td>1,200 – 1,500</td>
+              <td>Slawek Biel ("The Producer"), Koushik Rudra, Radek Osmulski</td>
+              <td>Discounted production NPV, 110-turn forward projection, leader bias targeting</td>
+              <td>Hand-tuned weights; highly interpretable, zero cold-start, vulnerable to multi-prong snipes.</td>
+            </tr>
+            <tr>
+              <td><strong style="color: var(--accent-emerald);">Our System (EXP-1092)</strong></td>
+              <td><strong>844.5 (899.1 Peak)</strong></td>
+              <td><strong>Our Agent (Rank 2,175 / 4,319)</strong></td>
+              <td><strong>(1)$ Analytical root-finding + 16-step vectorized lookahead + transit defense</strong></td>
+              <td><strong>18ms turn latency (94% speedup), runs in zero-dependency Kaggle sandbox.</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Failure Autopsies -->
+    <section id="failures">
+      <div class="section-header">
+        <div class="section-tag">Engineering Rigor</div>
+        <h2 class="section-title">Failure Autopsies: 5 Critical Anti-Patterns</h2>
+        <p class="section-desc">
+          Documented failure modes, empirical regressions, and structural post-mortems across 1,445+ tournament iterations.
+        </p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="feature-card" style="border-left: 3px solid var(--accent-rose);">
+          <h3 style="color: var(--accent-rose);">Anti-Pattern 1: Greedy Nearest-Neighbor</h3>
+          <p><strong>Symptom:</strong> Dispatching fleets to the nearest Euclidean planet without accounting for angular movement.</p>
+          <p style="margin-top: 6px;"><strong>Autopsy:</strong> Because planets rotate at distinct angular velocities, a target planet often swings away, resulting in a 40-turn wasted transit while home bases get captured.</p>
+        </div>
+
+        <div class="feature-card" style="border-left: 3px solid var(--accent-rose);">
+          <h3 style="color: var(--accent-rose);">Anti-Pattern 2: Discrete Step Integration</h3>
+          <p><strong>Symptom:</strong> Stepping Euler physics step-by-step (=0.1$) to find intercept times.</p>
+          <p style="margin-top: 6px;"><strong>Autopsy:</strong> Consumed 320ms per turn (64% of total time budget), leading to platform timeouts and random dispatches under turn latency pressure.</p>
+        </div>
+
+        <div class="feature-card" style="border-left: 3px solid var(--accent-rose);">
+          <h3 style="color: var(--accent-rose);">Anti-Pattern 3: Total Garrison Depletion</h3>
+          <p><strong>Symptom:</strong> Sending 100% of planet ships to capture a high-value outer planet.</p>
+          <p style="margin-top: 6px;"><strong>Autopsy:</strong> Left home planet at 0 ships; third-party opponents immediately sniped the base with a single ship, seizing 50 turns of accumulated production.</p>
+        </div>
+
+        <div class="feature-card" style="border-left: 3px solid var(--accent-rose);">
+          <h3 style="color: var(--accent-rose);">Anti-Pattern 4: Ignoring Transit Timers</h3>
+          <p><strong>Symptom:</strong> Evaluating planet ownership solely on present state, ignoring in-flight fleets.</p>
+          <p style="margin-top: 6px;"><strong>Autopsy:</strong> Dispatched fleets to conquer planets already targeted by overwhelming friendly reinforcements, causing redundant resource waste.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Career & Technical Interview Kit -->
+    <section id="interview">
+      <div class="section-header">
+        <div class="section-tag">Career &amp; Technical Presentation</div>
+        <h2 class="section-title">Technical Interview &amp; Portfolio Kit</h2>
+        <p class="section-desc">
+          Recruiter-ready architectural summaries and resume bullet points categorized by engineering domain.
+        </p>
+      </div>
+
+      <div class="lens-nav">
+        <button class="lens-btn active" onclick="setLens('all')">All Roles</button>
+        <button class="lens-btn" onclick="setLens('agent')">Autonomous Agent Architect</button>
+        <button class="lens-btn" onclick="setLens('mle')">Machine Learning Engineer</button>
+        <button class="lens-btn" onclick="setLens('sim')">Simulation &amp; Robotics Engineer</button>
+      </div>
+
+      <div class="cards-grid">
+        <!-- Agent Architect -->
+        <div class="feature-card" data-category="agent">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h3 style="margin: 0;">🤖 AI Agent Architect</h3>
+            <button class="btn" onclick="copySection('agent-bullets')">Copy Bullets</button>
+          </div>
+          <ul class="bullet-list" id="agent-bullets">
+            <li>Architected real-time autonomous agent decision pipeline for 500-turn multi-agent competition under a strict 18ms turn latency constraint.</li>
+            <li>Engineered 16-step forward state lookahead engine evaluating candidate action rollouts against 26 distinct baseline opponent archetypes.</li>
+            <li>Implemented dynamic 60s overage time banking, reallocating compute from low-stakes turns to critical high-variance combat encounters.</li>
+          </ul>
+        </div>
+
+        <!-- MLE -->
+        <div class="feature-card" data-category="mle">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h3 style="margin: 0;">⚡ Machine Learning Engineer</h3>
+            <button class="btn" onclick="copySection('mle-bullets')">Copy Bullets</button>
+          </div>
+          <ul class="bullet-list" id="mle-bullets">
+            <li>Built high-throughput simulation kernel using JAX and Numba achieving 1.5M+ simulation steps/second for scalable strategy search.</li>
+            <li>Designed and executed 1,445+ offline tournament experiments across 20-seed pairwise matrices to eliminate evaluation variance.</li>
+            <li>Achieved Top 50% finish on international Kaggle leaderboard (844.5 verified score) through systematic ablation and mathematical root-solving.</li>
+          </ul>
+        </div>
+
+        <!-- Simulation -->
+        <div class="feature-card" data-category="sim">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h3 style="margin: 0;">🚀 Simulation &amp; Robotics Lead</h3>
+            <button class="btn" onclick="copySection('sim-bullets')">Copy Bullets</button>
+          </div>
+          <ul class="bullet-list" id="sim-bullets">
+            <li>Derived closed-form analytical collision equation reducing Keplerian orbital transit calculations from 320ms discrete steps to &lt;12μs ((1)$).</li>
+            <li>Modeled 2D continuous space dynamics with time-varying gravity fields and multi-agent resource production net-present-value.</li>
+            <li>Built complete 1-command reproducible verification suite adhering to strict zero-exfiltration and public/private repo partitioning.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-Command Replication -->
+    <section id="reproduce">
+      <div class="section-header">
+        <div class="section-tag">Verification</div>
+        <h2 class="section-title">1-Command Reproducibility</h2>
+        <p class="section-desc">
+          Verify the complete pipeline in seconds with standard tooling.
+        </p>
+      </div>
+
+      <pre><code># 1. Clone the public portfolio repository
+git clone https://github.com/VijaiKMathew/orbit-wars.git
+cd orbit-wars
+
+# 2. Run automated 1-command verification suite
+bash run.sh
+
+# 3. Test submission syntax and agent compilation
+make verify
+make test</code></pre>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>
+        <strong>Orbit Wars Autonomous Agent Portfolio</strong> • Designed &amp; Engineered by <a href="https://www.kaggle.com/vijaikm" target="_blank" style="color: var(--accent-cyan);">Vijai K. Mathew</a>
+      </p>
+      <p style="margin-top: 6px;">
+        Released under the MIT License • Code &amp; Documentation adhere to Kaggle Competition Rules.
+      </p>
+    </footer>
+
+  </div>
+
+  <div id="toast">Toast message</div>
+
+  <script>
+    // Theme toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      document.getElementById('themeToggleBtn').innerText = next === 'dark' ? '🌙' : '☀️';
+      localStorage.setItem('theme', next);
+    }
+
+    // Role Lens Filter
+    function setLens(role) {
+      document.querySelectorAll('.lens-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const cards = document.querySelectorAll('[data-category]');
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category');
+        if (role === 'all' || cat === role) {
+          card.style.display = '';
+          card.style.opacity = '1';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Copy to Clipboard
+    function copySection(elementId) {
+      const el = document.getElementById(elementId);
+      const items = Array.from(el.querySelectorAll('li')).map(li => '• ' + li.innerText).join('
+
+');
+      navigator.clipboard.writeText(items).then(() => {
+        showToast('Resume bullets copied to clipboard!');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Interactive Canvas Simulation
+    const canvas = document.getElementById('orbitCanvas');
+    const ctx = canvas.getContext('2d');
+    let animationId;
+    let isRunning = true;
+
+    function resizeCanvas() {
+      if (!canvas || !canvas.parentElement) return;
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const planets = [
+      { r: 50,  speed: 0.024, angle: 0.2, size: 7,  color: '#f43f5e', name: 'P1 (Inner)', prod: 15 },
+      { r: 90,  speed: 0.017, angle: 1.5, size: 9,  color: '#06b6d4', name: 'P2', prod: 25 },
+      { r: 135, speed: 0.012, angle: 3.1, size: 12, color: '#10b981', name: 'P3 (Strategic)', prod: 45 },
+      { r: 180, speed: 0.008, angle: 4.8, size: 8,  color: '#f59e0b', name: 'P4', prod: 20 },
+      { r: 220, speed: 0.005, angle: 0.9, size: 14, color: '#8b5cf6', name: 'P5 (Fortress)', prod: 55 },
+      { r: 260, speed: 0.003, angle: 2.4, size: 11, color: '#ec4899', name: 'P6 (Outer)', prod: 35 }
+    ];
+
+    let fleets = [];
+
+    function spawnFleet(sourceIndex, targetIndex) {
+      const src = planets[sourceIndex];
+      const tgt = planets[targetIndex];
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      const sx = cx + Math.cos(src.angle) * src.r;
+      const sy = cy + Math.sin(src.angle) * src.r;
+
+      fleets.push({
+        sx: sx, sy: sy,
+        x: sx, y: sy,
+        targetPlanet: targetIndex,
+        speed: 1.75,
+        progress: 0,
+        color: src.color
+      });
+    }
+
+    function dispatchFleets() {
+      const src = Math.floor(Math.random() * planets.length);
+      let tgt = Math.floor(Math.random() * planets.length);
+      while(tgt === src) tgt = Math.floor(Math.random() * planets.length);
+      spawnFleet(src, tgt);
+      showToast('Dispatched intercept fleet from ' + planets[src].name + ' to ' + planets[tgt].name);
+    }
+
+    function toggleSim() {
+      isRunning = !isRunning;
+      const btn = document.getElementById('simToggleBtn');
+      btn.innerText = isRunning ? 'Pause Simulation' : 'Resume Simulation';
+      if (isRunning) draw();
+    }
+
+    function resetSim() {
+      fleets = [];
+      planets.forEach((p, i) => p.angle = (i * Math.PI) / 3);
+      showToast('Simulation state reset.');
+    }
+
+    setTimeout(() => {
+      spawnFleet(1, 4);
+      spawnFleet(2, 0);
+    }, 600);
+
+    function draw() {
+      if (!isRunning) return;
+
+      ctx.fillStyle = '#040711';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      // Central gravitational body
+      const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 32);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.3, '#fef08a');
+      grad.addColorStop(1, 'rgba(234, 179, 8, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 32, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Orbits & Planets
+      planets.forEach(p => {
+        p.angle += p.speed;
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy, p.r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const px = cx + Math.cos(p.angle) * p.r;
+        const py = cy + Math.sin(p.angle) * p.r;
+
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(px, py, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px -apple-system, sans-serif';
+        ctx.fillText(p.name + ' (+' + p.prod + ')', px + p.size + 4, py + 3);
+      });
+
+      // In-flight fleets
+      for (let i = fleets.length - 1; i >= 0; i--) {
+        const f = fleets[i];
+        const tgt = planets[f.targetPlanet];
+        const tx = cx + Math.cos(tgt.angle) * tgt.r;
+        const ty = cy + Math.sin(tgt.angle) * tgt.r;
+
+        const dx = tx - f.x;
+        const dy = ty - f.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 6) {
+          fleets.splice(i, 1);
+          continue;
+        }
+
+        f.x += (dx / dist) * f.speed;
+        f.y += (dy / dist) * f.speed;
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.setLineDash([2, 4]);
+        ctx.beginPath();
+        ctx.moveTo(f.sx, f.sy);
+        ctx.lineTo(tx, ty);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = f.color;
+        ctx.shadowColor = f.color;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      animationId = requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+</body>
+</html>
